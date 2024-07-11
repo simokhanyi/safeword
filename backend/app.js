@@ -4,9 +4,13 @@
  */
 
 import express from 'express';
+import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Initialize the application
 const app = express();
