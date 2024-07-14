@@ -9,7 +9,7 @@ const Home = () => {
       <p>Manage your secure emails and passwords easily and safely.</p>
       <div>
         <Button variant="primary" as={Link} to="/login" className="m-2">Login</Button>
-        <Button variant="secondary" as={Link} to="/register" className="m-2">Register</Button>
+        <Button variant="secondary" as={Link} to="/register" className="m-2">Sign Up</Button>
       </div>
     </div>
   );

@@ -7,6 +7,10 @@ import Register from './components/Auth/Register';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './hooks/useAuth';
 
+/**
+ * Main application component that includes routing and authentication context provider.
+ * @returns {JSX.Element} The main app component.
+ */
 const App = () => {
   return (
     <AuthProvider>

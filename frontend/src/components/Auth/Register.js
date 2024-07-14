@@ -1,33 +1,37 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { register } = useAuth();
+  const { register: registerUser } = useAuth();
+  const { handleSubmit, register, formState: { errors } } = useForm();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await register(email, password);
+  const onSubmit = async (data) => {
+    try {
+      await registerUser(data.email, data.password);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      // Handle error state or display error message
+    }
   };
 
   return (
     <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <input
           type="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...register('email', { required: true })}
         />
+        {errors.email && <span>Email is required</span>}
         <input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          {...register('password', { required: true })}
         />
-        <button type="submit">Register</button>
+        {errors.password && <span>Password is required</span>}
+        <button type="submit">Submit</button>
       </form>
     </div>
   );

@@ -1,44 +1,36 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 
-/**
- * Login component.
- * @component
- * @example
- * return (
- *   <Login />
- * )
- */
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { login } = useAuth();
+  const { handleSubmit, register, formState: { errors } } = useForm();
 
-  /**
-   * Handles form submission.
-   * @param {Object} e - Event object.
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await login(email, password);
+  const onSubmit = async (data) => {
+    try {
+      await login(data.email, data.password);
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Handle error state or display error message
+    }
   };
 
   return (
     <div>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <input
           type="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...register('email', { required: true })}
         />
+        {errors.email && <span>Email is required</span>}
         <input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          {...register('password', { required: true })}
         />
+        {errors.password && <span>Password is required</span>}
         <button type="submit">Login</button>
       </form>
     </div>

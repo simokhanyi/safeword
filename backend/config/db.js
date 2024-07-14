@@ -1,26 +1,42 @@
 /**
  * @file db.js
- * @description Configuration file for connecting to MongoDB
+ * @description Configuration file for connecting to PostgreSQL database using 'pg' library.
  */
 
-import mongoose from 'mongoose';
-import config from 'config';
+// Import 'pg' library using CommonJS syntax due to ESM compatibility
+import pkg from 'pg';
+const { Pool } = pkg;
+
+import config from 'config'; // Assuming you use a configuration module like 'config'
 
 /**
- * Connect to MongoDB
+ * PostgreSQL database connection pool.
+ * @type {Pool}
+ */
+const pool = new Pool({
+  connectionString: config.get('postgresURI'), // Adjust based on your config module
+  ssl: {
+    rejectUnauthorized: false, // Remove if not using SSL or adjust for your setup
+  },
+});
+
+/**
+ * Connect to PostgreSQL database.
+ * Logs successful connection or exits the process on error.
  */
 const connectDB = async () => {
   try {
-    await mongoose.connect(config.get('mongoURI'), {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    // Create indexes after connection is established
-    console.log('MongoDB Connected...');
+    const client = await pool.connect();
+    console.log('PostgreSQL Connected...');
+    // Optionally, you can release the client back to the pool after connecting
+    // client.release();
   } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    console.error('Error connecting to PostgreSQL:', err.message);
+    process.exit(-1); // Exit with error code
   }
 };
 
-export default connectDB;
+// Connect to PostgreSQL when this module is imported
+connectDB();
+
+export default pool;

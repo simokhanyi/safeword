@@ -1,6 +1,6 @@
-import { useState, useContext, createContext } from 'react';
+import React, { useState, useContext, createContext } from 'react';
+import axios from 'axios';
 
-// Create a context for authentication
 const AuthContext = createContext();
 
 /**
@@ -29,33 +29,48 @@ const useProvideAuth = () => {
   const [user, setUser] = useState(null);
 
   /**
-   * Simulates user login.
+   * Registers a new user.
+   * @param {string} email - The user's email.
+   * @param {string} password - The user's password.
+   * @returns {Promise<void>} The promise to handle registration.
+   */
+  const register = async (email, password) => {
+    try {
+      const response = await axios.post('/api/auth/register', { email, password });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Registration error:', error.response.data);
+      throw error;
+    }
+  };
+
+  /**
+   * Logs in a user.
    * @param {string} email - The user's email.
    * @param {string} password - The user's password.
    * @returns {Promise<void>} The promise to handle login.
    */
-  const login = (email, password) => {
-    // Replace with actual login logic
-    return new Promise((resolve) => {
-      setUser({ email });
-      resolve();
-    });
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post('/api/auth/login', { email, password });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Login error:', error.response.data);
+      throw error;
+    }
   };
 
   /**
-   * Simulates user logout.
+   * Logs out the current user.
    * @returns {Promise<void>} The promise to handle logout.
    */
-  const logout = () => {
-    // Replace with actual logout logic
-    return new Promise((resolve) => {
-      setUser(null);
-      resolve();
-    });
+  const logout = async () => {
+    setUser(null);
   };
 
   return {
     user,
+    register,
     login,
     logout,
   };
