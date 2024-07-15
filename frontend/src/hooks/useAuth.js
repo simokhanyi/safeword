@@ -6,9 +6,9 @@ const AuthContext = createContext();
 
 /**
  * AuthProvider component
- * 
+ *
  * This component provides authentication context to its children.
- * 
+ *
  * @param {Object} props - The component props.
  * @returns {JSX.Element} The context provider component.
  */
@@ -19,9 +19,9 @@ export const AuthProvider = ({ children }) => {
 
 /**
  * Custom hook to use authentication context.
- * 
+ *
  * This hook allows components to access authentication state and functions.
- * 
+ *
  * @returns {Object} The authentication context value.
  */
 export const useAuth = () => {
@@ -30,17 +30,19 @@ export const useAuth = () => {
 
 /**
  * useProvideAuth hook
- * 
- * This hook provides authentication logic including registration, login, and logout functions.
- * 
+ *
+ * This hook provides authentication logic including registration, login, and logout functions.       
+ *
  * @returns {Object} The authentication functions and state.
  */
 const useProvideAuth = () => {
-  const [user, setUser] = useState(null); // State to store user information
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user'))); // State to store user information
+
+  const isAuthenticated = !!localStorage.getItem('token'); // Check if the token is stored
 
   /**
    * Registers a new user.
-   * 
+   *
    * @param {string} email - The user's email.
    * @param {string} password - The user's password.
    * @returns {Promise<void>} The promise to handle registration.
@@ -49,6 +51,8 @@ const useProvideAuth = () => {
     try {
       const response = await axios.post('/api/auth/register', { email, password });
       setUser(response.data); // Update user state with response data
+      localStorage.setItem('token', response.data.token); // Store token in local storage
+      localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user in local storage
     } catch (error) {
       console.error('Registration error:', error.response.data);
       throw error; // Throw error to be handled by the caller
@@ -57,7 +61,7 @@ const useProvideAuth = () => {
 
   /**
    * Logs in a user.
-   * 
+   *
    * @param {string} email - The user's email.
    * @param {string} password - The user's password.
    * @returns {Promise<void>} The promise to handle login.
@@ -66,6 +70,8 @@ const useProvideAuth = () => {
     try {
       const response = await axios.post('/api/auth/login', { email, password });
       setUser(response.data); // Update user state with response data
+      localStorage.setItem('token', response.data.token); // Store token in local storage
+      localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user in local storage
     } catch (error) {
       console.error('Login error:', error.response.data);
       throw error; // Throw error to be handled by the caller
@@ -74,17 +80,20 @@ const useProvideAuth = () => {
 
   /**
    * Logs out the current user.
-   * 
+   *
    * This function clears the user state to log out the current user.
-   * 
+   *
    * @returns {Promise<void>} The promise to handle logout.
    */
   const logout = async () => {
     setUser(null); // Clear user state
+    localStorage.removeItem('token'); // Remove token from local storage
+    localStorage.removeItem('user'); // Remove user from local storage
   };
 
   return {
     user, // The current user
+    isAuthenticated, // Authentication status
     register, // Function to register a new user
     login, // Function to log in a user
     logout, // Function to log out the current user
