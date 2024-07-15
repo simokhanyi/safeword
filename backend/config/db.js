@@ -13,6 +13,10 @@ const postgresURI = config.get('postgresURI');
 const sequelize = new Sequelize(postgresURI, {
   dialect: 'postgres',
   logging: false, // Set to true to see SQL queries in console
+  define: {
+    timestamps: false, // Disable sequelize's timestamp fields (createdAt, updatedAt)
+    underscored: true, // Use underscored naming for created tables (e.g., user_group instead of userGroup)
+  },
 });
 
 // Function to connect to PostgreSQL

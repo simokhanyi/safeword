@@ -12,7 +12,7 @@ import sequelize from '../config/db.js';
 const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,

@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "simo_khanyi",
+    "password": "M!sasa12",
+    "database": "safeword",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "simo_khanyi",
+    "password": "M!sasa12",
+    "database": "safeword",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "simo_khanyi",
+    "password": "M!sasa12",
+    "database": "safeword",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
