@@ -43,7 +43,7 @@ export const registerUser = async (req, res) => {
       { expiresIn: '5d' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.status(201).json({ msg: 'User registered successfully', token });
       }
     );
   } catch (err) {

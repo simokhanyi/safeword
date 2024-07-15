@@ -53,3 +53,5 @@ process.on('unhandledRejection', (err, promise) => {
   // Exit the process with failure
   process.exit(1);
 });
+
+export default app;

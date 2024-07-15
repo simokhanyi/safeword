@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const Register = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const [registrationError, setRegistrationError] = useState('');
+  const history = useHistory(); // Initialize useHistory for redirection
 
-  const onSubmit = (data) => {
-    console.log(data);
-    // Add your registration logic here
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post('/api/auth/register', {
+        email: data.email,
+        password: data.password
+      });
+      console.log('Registration successful:', response.data);
+      // Optionally clear form fields after successful registration
+      reset(); // Reset form fields using reset() from useForm
+      // Optionally redirect to login page or display a success message
+      history.push('/login'); // Redirect to login page after successful registration
+    } catch (error) {
+      console.error('Registration error:', error.response.data);
+      setRegistrationError(error.response.data.msg); // Set registration error message
+    }
   };
 
   return (
@@ -44,8 +60,9 @@ const Register = () => {
               validate: value => value === watch('password') || "Passwords do not match"
             })}
           />
-          {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
+          {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>} 
         </div>
+        {registrationError && <p className="text-danger">{registrationError}</p>} {/* Display registration error message */}
         <button type="submit" className="btn btn-primary btn-block">Register</button>
       </form>
     </div>

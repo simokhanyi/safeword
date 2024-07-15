@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
 
 /**
@@ -21,6 +23,10 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route 
+            path="/profile" 
+            element={<ProtectedRoute element={Profile} />} 
+          /> {/* Use ProtectedRoute */}
         </Routes>
       </Router>
     </AuthProvider>
