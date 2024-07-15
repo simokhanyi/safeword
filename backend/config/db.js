@@ -1,35 +1,25 @@
 /**
  * @file db.js
- * @description Configuration file for connecting to PostgreSQL database using 'pg' library.
+ * @description Configuration file for connecting to PostgreSQL database using Sequelize.
  */
 
-// Import 'pg' library using CommonJS syntax due to ESM compatibility
-import pkg from 'pg';
-const { Pool } = pkg;
-
+import { Sequelize } from 'sequelize';
 import config from 'config'; // Assuming you use a configuration module like 'config'
 
-/**
- * PostgreSQL database connection pool.
- * @type {Pool}
- */
-const pool = new Pool({
-  connectionString: config.get('postgresURI'), // Adjust based on your config module
-  ssl: {
-    rejectUnauthorized: false, // Remove if not using SSL or adjust for your setup
-  },
+// Get PostgreSQL URI from configuration
+const postgresURI = config.get('postgresURI');
+
+// Initialize Sequelize with the PostgreSQL connection URI
+const sequelize = new Sequelize(postgresURI, {
+  dialect: 'postgres',
+  logging: false, // Set to true to see SQL queries in console
 });
 
-/**
- * Connect to PostgreSQL database.
- * Logs successful connection or exits the process on error.
- */
+// Function to connect to PostgreSQL
 const connectDB = async () => {
   try {
-    const client = await pool.connect();
+    await sequelize.authenticate();
     console.log('PostgreSQL Connected...');
-    // Optionally, you can release the client back to the pool after connecting
-    // client.release();
   } catch (err) {
     console.error('Error connecting to PostgreSQL:', err.message);
     process.exit(-1); // Exit with error code
@@ -39,4 +29,4 @@ const connectDB = async () => {
 // Connect to PostgreSQL when this module is imported
 connectDB();
 
-export default pool;
+export default sequelize;

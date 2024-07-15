@@ -1,35 +1,44 @@
 /**
  * @file Password.js
- * @description Mongoose model for Password
+ * @description Sequelize model for Password
  */
 
-import mongoose from 'mongoose';
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/db.js';
+import User from './User.js';
 
 /**
- * Password Schema
+ * Password Model
  */
-const PasswordSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+const Password = sequelize.define('Password', {
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
   },
   email: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   password: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   description: {
-    type: String,
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   date: {
-    type: Date,
-    default: Date.now,
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
 });
 
-const Password = mongoose.model('Password', PasswordSchema);
+// Define associations
+Password.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Password, { foreignKey: 'userId' });
+
 export default Password;

@@ -1,3 +1,4 @@
 {
-  "postgresURI": "postgresql://simok_khanyi:M!sasa12@localhost:5432/safeword"
+  "postgresURI": "postgresql://simok_khanyi:M!sasa12@localhost:5432/safeword",
+  "jwtSecret": "f1b1b566983a2efb051523cdea036df7bc17c72f22f2f826347f8ab28276f52f2783ae4382a96822787ea10fb86caae27cf40a59651264aaa69841d47c81e3c7"
 }
