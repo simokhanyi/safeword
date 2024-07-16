@@ -5,9 +5,9 @@ import { useAuth } from '../../hooks/useAuth';
 
 /**
  * Login Component
- * 
+ *
  * This component renders a login form for users to enter their email and password.
- * It uses the `react-hook-form` library to handle form state and validation, 
+ * It uses the `react-hook-form` library to handle form state and validation,
  * and the `useAuth` custom hook to manage authentication logic.
  */
 const Login = () => {
@@ -17,11 +17,11 @@ const Login = () => {
 
   /**
    * onSubmit
-   * 
+   *
    * This function is called when the form is submitted. It attempts to log the user in
    * with the provided email and password. If login is successful, the user is redirected
    * to their profile page. If login fails, an error message is displayed.
-   * 
+   *
    * @param {Object} data - The form data containing email and password
    */
   const onSubmit = async (data) => {

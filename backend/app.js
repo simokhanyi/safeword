@@ -8,8 +8,10 @@ import dotenv from 'dotenv';
 import sequelize from './config/db.js';
 import authRoutes from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
-import './models/User.js'; // Import User model
-import './models/Password.js'; // Import Password model
+import protectedRoutes from './routes/protected.js';
+import jwtMiddleware from './middleware/jwtMiddleware.js';
+import './models/User.js';
+import './models/Password.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -22,7 +24,8 @@ app.use(express.json({ extended: false }));
 
 // Define application routes
 app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes); // Include profile routes here
+app.use('/api/profile', profileRoutes);
+app.use('/api/protected', jwtMiddleware, protectedRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from 'react';
+import React, { useState, useContext, createContext, useEffect } from 'react';
 import axios from 'axios';
 
 // Create a context for authentication
@@ -36,9 +36,31 @@ export const useAuth = () => {
  * @returns {Object} The authentication functions and state.
  */
 const useProvideAuth = () => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user'))); // State to store user information
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error('Error parsing user data from localStorage:', error);
+      return null;
+    }
+  });
 
-  const isAuthenticated = !!localStorage.getItem('token'); // Check if the token is stored
+  const isAuthenticated = !!localStorage.getItem('token');
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }, []);
 
   /**
    * Registers a new user.
@@ -50,12 +72,12 @@ const useProvideAuth = () => {
   const register = async (email, password) => {
     try {
       const response = await axios.post('/api/auth/register', { email, password });
-      setUser(response.data); // Update user state with response data
-      localStorage.setItem('token', response.data.token); // Store token in local storage
-      localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user in local storage
+      setUser(response.data.user);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
     } catch (error) {
       console.error('Registration error:', error.response.data);
-      throw error; // Throw error to be handled by the caller
+      throw error;
     }
   };
 
@@ -69,12 +91,12 @@ const useProvideAuth = () => {
   const login = async (email, password) => {
     try {
       const response = await axios.post('/api/auth/login', { email, password });
-      setUser(response.data); // Update user state with response data
-      localStorage.setItem('token', response.data.token); // Store token in local storage
-      localStorage.setItem('user', JSON.stringify(response.data.user)); // Store user in local storage
+      setUser(response.data.user);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
     } catch (error) {
       console.error('Login error:', error.response.data);
-      throw error; // Throw error to be handled by the caller
+      throw error;
     }
   };
 
@@ -86,16 +108,18 @@ const useProvideAuth = () => {
    * @returns {Promise<void>} The promise to handle logout.
    */
   const logout = async () => {
-    setUser(null); // Clear user state
-    localStorage.removeItem('token'); // Remove token from local storage
-    localStorage.removeItem('user'); // Remove user from local storage
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   return {
-    user, // The current user
-    isAuthenticated, // Authentication status
-    register, // Function to register a new user
-    login, // Function to log in a user
-    logout, // Function to log out the current user
+    user,
+    isAuthenticated,
+    register,
+    login,
+    logout,
   };
 };
+
+export default useAuth;
