@@ -6,7 +6,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import sequelize from './config/db.js';
-import authRoutes from './routes/auth.js';
+import { auth, register, login } from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
 import protectedRoutes from './routes/protected.js';
 import jwtMiddleware from './middleware/jwtMiddleware.js';
@@ -19,12 +19,13 @@ dotenv.config();
 // Initialize the application
 const app = express();
 
-// Init middleware to parse JSON
-app.use(express.json({ extended: false }));
+// Middleware to parse JSON
+app.use(express.json());
 
-// Define application routes
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
+// Define application routes using imported middleware functions
+app.post('/api/auth/register', register);
+app.post('/api/auth/login', login);
+app.use('/api/profile', jwtMiddleware, profileRoutes);
 app.use('/api/protected', jwtMiddleware, protectedRoutes);
 
 // Basic route for testing
@@ -40,7 +41,7 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('PostgreSQL Connected...');
-    await sequelize.sync({ alter: true }); // Sync models to the database
+    await sequelize.sync({ alter: true });
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
   } catch (err) {
     console.error('Unable to connect to the database:', err.message);

@@ -1,65 +1,122 @@
-import express from 'express';
-import { check, validationResult } from 'express-validator';
-import { registerUser, loginUser } from '../controllers/authController.js';
+/**
+ * @file auth.js
+ * @description Middleware to verify JWT token and authenticate user
+ */
 
-const router = express.Router();
+import jwt from 'jsonwebtoken';
+import config from 'config';
+import User from '../models/User.js';
 
 /**
- * @route POST /api/auth/register
- * @desc Register a new user
- * @access Public
+ * Authenticate user using JWT token
  */
-router.post(
-  '/register',
-  [
-    // Validate email
-    check('email', 'Please include a valid email').isEmail(),
-    // Validate password
-    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-  ],
-  async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+export const auth = (req, res, next) => {
+  const token = req.header('x-auth-token');
+  if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
 
-    try {
-      await registerUser(req, res); // Delegate registration logic to controller
-    } catch (error) {
-      console.error('Registration error:', error);
-      res.status(500).json({ msg: 'Server Error' });
-    }
+  try {
+    const decoded = jwt.verify(token, config.get('jwtSecret'));
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    console.error(err.message);
+    res.status(401).json({ msg: 'Token is not valid' });
   }
-);
+};
 
 /**
- * @route POST /api/auth/login
- * @desc Authenticate user & get token (Login)
- * @access Public
+ * Middleware to handle registration
  */
-router.post(
-  '/login',
-  [
-    // Validate email
-    check('email', 'Please include a valid email').isEmail(),
-    // Validate password
-    check('password', 'Password is required').exists(),
-  ],
-  async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+export const register = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({ msg: 'User already exists, try logging in' });
     }
 
-    try {
-      await loginUser(req, res); // Delegate login logic to controller
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ msg: 'Server Error' });
-    }
+    // Create a new user if the user does not exist
+    user = new User({
+      email,
+      password
+    });
+
+    // Save the user to the database
+    await user.save();
+
+    // Generate JWT token
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(
+      payload,
+      config.get('jwtSecret'),
+      { expiresIn: 3600 },
+      (tokenErr, token) => {
+        if (tokenErr) throw tokenErr;
+        res.json({
+          msg: 'Registration successful',
+          token,
+          user: {
+            id: user.id
+          }
+        });
+      }
+    );
+  } catch (error) {
+    console.error('Registration error:', error.message);
+    res.status(500).send('Server Error');
   }
-);
+};
 
-export default router;
+/**
+ * Middleware to handle user login
+ */
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    // Validate password
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(
+      payload,
+      config.get('jwtSecret'),
+      { expiresIn: 3600 },
+      (tokenErr, token) => {
+        if (tokenErr) throw tokenErr;
+        res.json({
+          msg: 'Login successful',
+          token
+        });
+      }
+    );
+  } catch (error) {
+    console.error('Login error:', error.message);
+    res.status(500).send('Server Error');
+  }
+};

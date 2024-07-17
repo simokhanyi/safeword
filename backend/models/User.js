@@ -12,20 +12,20 @@ import sequelize from '../config/db.js';
 const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true, // Allow null values for name
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: false, // Email cannot be null
+    unique: true, // Email must be unique
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false, // Password cannot be null
   },
   date: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    defaultValue: DataTypes.NOW, // Default value for date is current timestamp
   },
 });
 

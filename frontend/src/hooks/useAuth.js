@@ -31,34 +31,29 @@ export const useAuth = () => {
 /**
  * useProvideAuth hook
  *
- * This hook provides authentication logic including registration, login, and logout functions.       
+ * This hook provides authentication logic including registration, login, and logout functions.
  *
  * @returns {Object} The authentication functions and state.
  */
 const useProvideAuth = () => {
-  const [user, setUser] = useState(() => {
-    try {
-      const storedUser = localStorage.getItem('user');
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch (error) {
-      console.error('Error parsing user data from localStorage:', error);
-      return null;
-    }
-  });
-
-  const isAuthenticated = !!localStorage.getItem('token');
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
       try {
         setUser(JSON.parse(storedUser));
+        setIsAuthenticated(true);
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
         setUser(null);
+        setIsAuthenticated(false);
       }
     } else {
       setUser(null);
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -75,6 +70,7 @@ const useProvideAuth = () => {
       setUser(response.data.user);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Registration error:', error.response.data);
       throw error;
@@ -94,6 +90,7 @@ const useProvideAuth = () => {
       setUser(response.data.user);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Login error:', error.response.data);
       throw error;
@@ -109,6 +106,7 @@ const useProvideAuth = () => {
    */
   const logout = async () => {
     setUser(null);
+    setIsAuthenticated(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
