@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 /**
  * Register Component
  * 
- * This component renders a registration form for new users to enter their email and password.
+ * This component renders a registration form for new users to enter their name, email, and password.
  * It uses the `react-hook-form` library to handle form state and validation, 
  * and the `useAuth` custom hook to manage authentication logic.
  */
@@ -17,13 +17,13 @@ const Register = () => {
    * onSubmit
    * 
    * This function is called when the form is submitted. It attempts to register the user
-   * with the provided email and password. If registration fails, an error message is displayed.
+   * with the provided name, email, and password. If registration fails, an error message is displayed.
    * 
-   * @param {Object} data - The form data containing email and password
+   * @param {Object} data - The form data containing name, email, and password
    */
   const onSubmit = async (data) => {
     try {
-      await registerUser(data.email, data.password);
+      await registerUser(data.name, data.email, data.password);
     } catch (error) {
       console.error('Registration failed:', error);
       // Handle error state or display error message
@@ -36,6 +36,14 @@ const Register = () => {
       <h2>Sign Up</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <ul style={{ listStyleType: 'none', padding: 0 }}>
+          <li>
+            <input
+              type="text"
+              placeholder="Name"
+              {...register('name', { required: 'Name is required' })}
+            />
+            {errors.name && <span>{errors.name.message}</span>}
+          </li>
           <li>
             <input
               type="email"

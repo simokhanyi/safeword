@@ -6,7 +6,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import sequelize from './config/db.js';
-import { auth, register, login } from './routes/auth.js';
+import { register, login } from './routes/auth.js';
 import profileRoutes from './routes/profile.js';
 import protectedRoutes from './routes/protected.js';
 import jwtMiddleware from './middleware/jwtMiddleware.js';

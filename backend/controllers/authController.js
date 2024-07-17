@@ -1,12 +1,20 @@
+/**
+ * Controller for user authentication operations.
+ * @module controllers/authController
+ */
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import User from '../models/User.js';
 
 /**
- * @desc Register a new user
- * @route POST /api/auth/register
- * @access Public
+ * Register a new user.
+ * @function registerUser
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response indicating success or failure
+ * @throws {Error} Server error if registration fails
  */
 export const registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -14,7 +22,7 @@ export const registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { name, email, password } = req.body; // Extract 'name', 'email', 'password' from request body
 
   try {
     let user = await User.findOne({ where: { email } });
@@ -27,6 +35,7 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     user = await User.create({
+      name,
       email,
       password: hashedPassword,
     });
@@ -53,9 +62,12 @@ export const registerUser = async (req, res) => {
 };
 
 /**
- * @desc Authenticate user & get token (Login)
- * @route POST /api/auth/login
- * @access Public
+ * Authenticate user and generate JWT token.
+ * @function loginUser
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response containing JWT token upon successful login
+ * @throws {Error} Server error if login fails
  */
 export const loginUser = async (req, res) => {
   const errors = validationResult(req);
@@ -63,7 +75,7 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { email, password } = req.body; // Extract 'email', 'password' from request body
 
   try {
     let user = await User.findOne({ where: { email } });
